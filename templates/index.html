@@ -2,25 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speech to Text</title>
-    <!-- Link to CSS in static folder -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>🎤 Speech to Text</h1>
-        <p>Click the button and speak into your microphone.</p>
-        <form method="POST" action="/">
-            <button type="submit">Start Listening</button>
-        </form>
+        <p>Select a WAV audio file and click Upload.</p>
 
-        {% if text %}
-        <div class="result">
-            <h2>Result:</h2>
-            <p>{{ text }}</p>
+        <input type="file" id="audio_file" accept=".wav">
+        <button onclick="uploadAudio()">Upload & Convert</button>
+
+        <div id="result">
+            {% if text %}
+                <h2>Result:</h2>
+                <p>{{ text }}</p>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
+
+    <script>
+        function uploadAudio() {
+            const fileInput = document.getElementById('audio_file');
+            const file = fileInput.files[0];
+            if (!file) { alert("Select a WAV file first"); return; }
+
+            const formData = new FormData();
+            formData.append('audio_data', file);
+
+            fetch('/', { method: 'POST', body: formData })
+                .then(response => response.text())
+                .then(data => { document.open(); document.write(data); document.close(); })
+                .catch(err => alert("Error: " + err));
+        }
+    </script>
 </body>
 </html>
